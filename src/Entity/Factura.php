@@ -13,7 +13,14 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['read']
+    ],
+    denormalizationContext: [
+        'groups' => ['write']
+    ]
+)]
 #[ApiFilter(SearchFilter::class, properties: ['cliente.name' => 'partial'])]
 #[ApiFilter(OrderFilter::class, properties: ['numfactura' => 'desc'])]
 class Factura
