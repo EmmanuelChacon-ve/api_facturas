@@ -2,57 +2,65 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\FacturaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
 #[ApiResource]
+#[ApiFilter(SearchFilter::class, properties: ['cliente.name' => 'partial'])]
+#[ApiFilter(OrderFilter::class, properties: ['numfactura' => 'desc'])]
 class Factura
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["read", "write"])]
     private ?string $numfactura = null;
 
     #[ORM\Column]
+    #[Groups(['read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['write'])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['write'])]
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'facturas')]
+    #[Groups(['write'])]
     private ?Cliente $cliente = null;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: LineaFactura::class)]
+    #[Groups(['write'])]
     private Collection $lineasfacturas;
 
-  /*   #[ORM\ManyToOne(inversedBy: 'facturas_cli')]
-    private ?Cliente $cliente_factura = null;
- */
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: Pago::class)]
+    #[Groups(['write'])]
     private Collection $pagos;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: EstadoCuenta::class)]
+    #[Groups(['write'])]
     private Collection $estadosCuenta;
-
-    #[ORM\OneToMany(mappedBy: 'facturas', targetEntity: EstadoCuenta::class)]
-    private Collection $estadoCuentas;
 
     public function __construct()
     {
         $this->lineasfacturas = new ArrayCollection();
         $this->pagos = new ArrayCollection();
         $this->estadosCuenta = new ArrayCollection();
-        $this->estadoCuentas = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,10 +233,7 @@ class Factura
     /**
      * @return Collection<int, EstadoCuenta>
      */
-    public function getEstadoCuentas(): Collection
-    {
-        return $this->estadoCuentas;
-    }
+
 
 /*     public function addEstadoCuenta(EstadoCuenta $estadoCuenta): static
     {

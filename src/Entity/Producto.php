@@ -39,13 +39,11 @@ class Producto
     #[ORM\OneToMany(mappedBy: 'producto', targetEntity: LineaFactura::class)]
     private Collection $lineasFactura;
 
-    #[ORM\OneToMany(mappedBy: 'productoslinea', targetEntity: LineaFactura::class)]
-    private Collection $LineasFacturas;
 
     public function __construct()
     {
         $this->lineasFactura = new ArrayCollection();
-        $this->LineasFacturas = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -155,11 +153,4 @@ class Producto
         return $this;
     }
 
-    /**
-     * @return Collection<int, LineaFactura>
-     */
-    public function getLineasFacturas(): Collection
-    {
-        return $this->LineasFacturas;
-    }
 }
