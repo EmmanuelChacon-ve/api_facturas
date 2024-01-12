@@ -4,17 +4,27 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ClienteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\DeleteController;
+use Gedmo\Mapping\Annotation as Gedmo;
+use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
+
+
+#[Gedmo\SoftDeleteable(fieldName: 'deleteAt', timeAware: false, hardDelete: false)]
+
 class Cliente
 {
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -35,7 +45,7 @@ class Cliente
     #[ORM\OneToMany(mappedBy: 'cliente', targetEntity: Factura::class)]
     private Collection $facturas;
 
-   
+
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createAt = null;
@@ -43,9 +53,10 @@ class Cliente
     #[ORM\Column]
     private ?\DateTimeImmutable $updateAt = null;
 
+    
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $deleteAt = null;
-
     public function __construct()
     {
         $this->facturas = new ArrayCollection();
@@ -139,9 +150,9 @@ class Cliente
      */
 
 
-   
 
-   
+
+
 
     public function getCreateAt(): ?\DateTimeImmutable
     {
@@ -167,15 +178,33 @@ class Cliente
         return $this;
     }
 
+    /**
+     * @return \DateTimeImmutable|null
+     */
     public function getDeleteAt(): ?\DateTimeImmutable
     {
         return $this->deleteAt;
     }
 
-    public function setDeleteAt(?\DateTimeImmutable $deleteAt): static
+    /**
+     * @param \DateTimeImmutable|null $deleteAt
+     * @return self
+     */
+    public function setDeleteAt(?\DateTimeImmutable $deleteAt): self
     {
         $this->deleteAt = $deleteAt;
 
         return $this;
+    }
+
+  
+    public function delete(): void
+    {
+        $this->deleteAt = new \DateTimeImmutable();
+    }
+
+    public function restore(): void
+    {
+        $this->deleteAt = null;
     }
 }

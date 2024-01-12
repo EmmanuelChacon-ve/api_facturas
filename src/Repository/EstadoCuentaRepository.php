@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+
+use App\Entity\Cliente;
 use App\Entity\EstadoCuenta;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -45,4 +47,14 @@ class EstadoCuentaRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+public function findByCliente(Cliente $cliente): ?EstadoCuenta
+{
+    return $this->findOneBy(['cliente' => $cliente]);
+}
+
+public function findByFacturaId(int $facturaId): ?EstadoCuenta
+{
+    return $this->findOneBy(['factura' => $facturaId]);
+}
 }

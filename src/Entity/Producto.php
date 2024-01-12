@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ProductoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,6 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductoRepository::class)]
 #[ApiResource]
+
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
 class Producto
 {
     #[ORM\Id]

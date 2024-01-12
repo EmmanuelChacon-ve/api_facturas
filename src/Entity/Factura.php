@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
 #[ApiResource(
-    normalizationContext: [
+    normalizationContext: [ 
         'groups' => ['read']
     ],
     denormalizationContext: [
