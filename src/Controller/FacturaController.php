@@ -35,7 +35,7 @@ class FacturaController extends AbstractController
         return new JsonResponse($serializedData, 200, [], true);
     }
 
-    #[Route('/factura', name: 'app_create_factura', methods: ['POST'])]
+ /*    #[Route('/factura', name: 'app_create_factura', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -62,8 +62,30 @@ class FacturaController extends AbstractController
         $entityManager->flush();
 
         // Serializar la factura creada con el grupo 'read'
-        $serializedData = $this->serializer->serialize($factura, 'json', ['groups' => ['read']]);
+        $serializedData = $this->serializeFacturas([$factura]);
 
         return new JsonResponse($serializedData, 201, [], true);
+    } */
+
+    #[Route('/factura/{clienteId}', name: 'app_factura_por_cliente', methods: ['GET'])]
+    public function facturasPorCliente(int $clienteId): JsonResponse
+    {
+        $facturas = $this->doctrine->getRepository(Factura::class)->findBy(['cliente' => $clienteId]);
+        $serializedData = $this->serializeFacturas($facturas);
+
+        return new JsonResponse($serializedData, 200, [], true);
+    }
+
+    #[Route('/factura/{clienteId}/count', name: 'app_count_facturas_por_cliente', methods: ['GET'])]
+    public function countFacturasPorCliente(int $clienteId): JsonResponse
+    {
+        $numeroFacturas = count($this->doctrine->getRepository(Factura::class)->findBy(['cliente' => $clienteId]));
+
+        return new JsonResponse(['numero_facturas' => $numeroFacturas], 200);
+    }
+
+    private function serializeFacturas(array $facturas): string
+    {
+        return $this->serializer->serialize($facturas, 'json', ['groups' => ['read']]);
     }
 }

@@ -48,7 +48,7 @@ class EstadoCuentaRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-public function findByCliente(Cliente $cliente): ?EstadoCuenta
+/* public function findByCliente(Cliente $cliente): ?EstadoCuenta
 {
     return $this->findOneBy(['cliente' => $cliente]);
 }
@@ -56,5 +56,5 @@ public function findByCliente(Cliente $cliente): ?EstadoCuenta
 public function findByFacturaId(int $facturaId): ?EstadoCuenta
 {
     return $this->findOneBy(['factura' => $facturaId]);
-}
+} */
 }

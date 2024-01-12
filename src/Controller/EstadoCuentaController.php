@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class EstadoCuentaController extends AbstractController
-{
+{ 
     private EstadoCuentaRepository $estadoCuentaRepository;
 
     public function __construct(EstadoCuentaRepository $estadoCuentaRepository)
@@ -18,16 +18,8 @@ class EstadoCuentaController extends AbstractController
         $this->estadoCuentaRepository = $estadoCuentaRepository;
     }
 
-    #[Route('/api/estado_cuenta/{facturaId}/calcular_saldo', name: 'app_calcular_saldo', methods: ['GET'])]
-    public function calcularSaldo(int $facturaId): JsonResponse
+    public function __invoke(EstadoCuenta $estadoCuenta): JsonResponse
     {
-        // Obtener el estado de cuenta para la factura específica
-        $estadoCuenta = $this->estadoCuentaRepository->findOneBy(['factura' => $facturaId]);
-
-        if ($estadoCuenta === null) {
-            return new JsonResponse(['message' => 'No se encontró el estado de cuenta para la factura.'], Response::HTTP_NOT_FOUND);
-        }
-
         // Calcular el resultado (restar saldo pendiente del saldo actual)
         $resultado = $estadoCuenta->getSaldoActual() - $estadoCuenta->getMontoPendiente();
 

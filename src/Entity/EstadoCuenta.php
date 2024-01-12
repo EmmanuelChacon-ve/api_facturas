@@ -5,10 +5,33 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EstadoCuentaRepository;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use App\Controller\EstadoCuentaController;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: EstadoCuentaRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: [ 
+        'groups' => ['read']
+    ],
+    denormalizationContext: [
+        'groups' => ['write']
+    ],
+    operations: [
+        new Get(
+            name: 'calcular_saldo', 
+            uriTemplate: '/estado_cuenta/{id}/calcular',
+            controller: EstadoCuentaController::class,
+            read: false,
+            output: false,
+        ),
+        new GetCollection(),
+    ]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['factura' => 'partial'])]
 class EstadoCuenta
 {
     #[ORM\Id]

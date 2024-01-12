@@ -17,8 +17,8 @@ class DeleteController extends AbstractController
     {
         $this->entityManager = $entityManager;
     }
-
-     #[Route('/api/delete/clientes/{id}', name: 'app_delete')]
+/* 
+     #[Route('/api/delete/clientes/{id}', name: 'app_delete')] */
     public function delete(Cliente $cliente): JsonResponse
     {
         // Verificar si el cliente ya ha sido eliminado lógicamente

@@ -10,6 +10,12 @@ use App\Repository\FacturaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use App\Controller\FacturaController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
@@ -19,7 +25,18 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
     denormalizationContext: [
         'groups' => ['write']
+    ],
+
+    operations: [
+        new Get(
+          
+        ),
+        new GetCollection(),
+        new Delete(
+            controller: FacturaController::class,
+        ),
     ]
+
 )]
 #[ApiFilter(SearchFilter::class, properties: ['cliente.name' => 'partial'])]
 #[ApiFilter(OrderFilter::class, properties: ['numfactura' => 'desc'])]
