@@ -29,11 +29,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
     operations: [
         new Get(
-          
+            name: 'facturas', 
+            uriTemplate: '/facturas/{id}/calcular',
+            controller: FacturaController::class,
+            read: false,
+            output: false,
+            filters: ['cliente']
         ),
         new GetCollection(),
         new Delete(
-            controller: FacturaController::class,
+            
         ),
     ]
 

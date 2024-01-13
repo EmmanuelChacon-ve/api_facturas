@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Cliente;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 class DeleteController extends AbstractController
 {
@@ -17,13 +17,12 @@ class DeleteController extends AbstractController
     {
         $this->entityManager = $entityManager;
     }
-/* 
-     #[Route('/api/delete/clientes/{id}', name: 'app_delete')] */
-    public function delete(Cliente $cliente): JsonResponse
+
+    public function __invoke(Cliente $cliente): Response
     {
         // Verificar si el cliente ya ha sido eliminado lógicamente
         if ($cliente->getDeleteAt() !== null) {
-            return new JsonResponse(['message' => 'El cliente ya ha sido eliminado lógicamente.'], Response::HTTP_BAD_REQUEST);
+            throw new BadRequestHttpException('El cliente ya ha sido eliminado lógicamente.');
         }
 
         // Realizar el borrado lógico
@@ -33,9 +32,6 @@ class DeleteController extends AbstractController
         $this->entityManager->flush();
 
         // Devolver una respuesta JSON indicando el éxito del borrado lógico
-        return new JsonResponse(['message' => 'Borrado lógico exitoso']);
-    }    
-    
-
-
+        return new Response(null, Response::HTTP_NO_CONTENT);
+    }
 }

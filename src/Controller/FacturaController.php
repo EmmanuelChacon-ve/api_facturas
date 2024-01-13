@@ -1,91 +1,26 @@
 <?php
-
 namespace App\Controller;
-
+use App\Entity\Cliente;
 use App\Entity\Factura;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\FacturaRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Component\Routing\Annotation\Route;
-use Doctrine\Persistence\ManagerRegistry;
-
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class FacturaController extends AbstractController
 {
-    private SerializerInterface $serializer;
-    private ValidatorInterface $validator;
-    private ManagerRegistry $doctrine;
+    private FacturaRepository $facturaRepository;
 
-    public function __construct(SerializerInterface $serializer, ValidatorInterface $validator, ManagerRegistry $doctrine)
+    public function __construct(FacturaRepository $facturaRepository)
     {
-        $this->serializer = $serializer;
-        $this->validator = $validator;
-        $this->doctrine = $doctrine;
+        $this->facturaRepository = $facturaRepository;
     }
 
-    #[Route('/factura', name: 'app_factura', methods: ['GET'])]
-    public function index(): JsonResponse
-    {
-        $facturas = $this->doctrine->getRepository(Factura::class)->findAll();
-
-        // Serializar la lista de facturas con el grupo 'read'
-        $serializedData = $this->serializer->serialize($facturas, 'json', ['groups' => ['read']]);
-
-        return new JsonResponse($serializedData, 200, [], true);
-    }
-
- /*    #[Route('/factura', name: 'app_create_factura', methods: ['POST'])]
-    public function create(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-
-        // Deserializar los datos con el grupo 'write'
-        $factura = $this->serializer->deserialize($data, Factura::class, 'json', ['groups' => ['write']]);
-
-        // Validar la entidad
-        $errors = $this->validator->validate($factura);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
-            }
-
-            return new JsonResponse(['errors' => $errorMessages], 400);
+  
+        public function __invoke(Cliente $cliente): JsonResponse
+        {
+            // Obtener la cantidad de facturas asociadas al cliente
+            $cantidadFacturas = count($cliente->getFacturas());
+    
+            return new JsonResponse(['cliente_id' => $cliente->getId(), 'cantidad_facturas' => $cantidadFacturas]);
         }
-
-        // Guardar la factura en la base de datos utilizando el EntityManager
-        $entityManager = $this->doctrine->getManager();
-        $entityManager->persist($factura);
-        $entityManager->flush();
-
-        // Serializar la factura creada con el grupo 'read'
-        $serializedData = $this->serializeFacturas([$factura]);
-
-        return new JsonResponse($serializedData, 201, [], true);
-    } */
-
-    #[Route('/factura/{clienteId}', name: 'app_factura_por_cliente', methods: ['GET'])]
-    public function facturasPorCliente(int $clienteId): JsonResponse
-    {
-        $facturas = $this->doctrine->getRepository(Factura::class)->findBy(['cliente' => $clienteId]);
-        $serializedData = $this->serializeFacturas($facturas);
-
-        return new JsonResponse($serializedData, 200, [], true);
     }
 
-    #[Route('/factura/{clienteId}/count', name: 'app_count_facturas_por_cliente', methods: ['GET'])]
-    public function countFacturasPorCliente(int $clienteId): JsonResponse
-    {
-        $numeroFacturas = count($this->doctrine->getRepository(Factura::class)->findBy(['cliente' => $clienteId]));
-
-        return new JsonResponse(['numero_facturas' => $numeroFacturas], 200);
-    }
-
-    private function serializeFacturas(array $facturas): string
-    {
-        return $this->serializer->serialize($facturas, 'json', ['groups' => ['read']]);
-    }
-}

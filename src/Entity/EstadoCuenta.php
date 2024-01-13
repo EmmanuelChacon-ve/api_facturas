@@ -6,6 +6,10 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\EstadoCuentaRepository;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Post;
+
 use ApiPlatform\Metadata\GetCollection;
 use App\Controller\EstadoCuentaController;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,6 +33,9 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
             output: false,
         ),
         new GetCollection(),
+        new Put(),
+        new Delete(),
+        new Post(),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['factura' => 'partial'])]

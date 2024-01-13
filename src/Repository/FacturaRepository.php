@@ -20,6 +20,15 @@ class FacturaRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Factura::class);
     }
+    public function countByCliente($clienteId): int
+    {
+        return $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->andWhere('f.cliente = :clienteId')
+            ->setParameter('clienteId', $clienteId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 
 //    /**
 //     * @return Factura[] Returns an array of Factura objects

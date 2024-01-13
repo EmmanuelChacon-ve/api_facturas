@@ -26,16 +26,22 @@ use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
     denormalizationContext: ['groups' => ['write']],
     operations: [
         new Get(
-          
+            
         ),
         new GetCollection(),
-        new Delete(),
+        new Delete(
+            name: 'EliminadoLogico', 
+            uriTemplate: '/clientes/{id}/delete',
+            controller: DeleteController::class,
+            read: false,
+            output: false,
+        ),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
 
 
-#[Gedmo\SoftDeleteable(fieldName: 'deleteAt', timeAware: false, hardDelete: false)]
+/* #[Gedmo\SoftDeleteable(fieldName: 'deleteAt', timeAware: false, hardDelete: false)] */
 
 class Cliente
 {
