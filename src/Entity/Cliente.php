@@ -22,7 +22,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
-#[ORM\HasLifecycleCallbacks]
+/* #[ORM\HasLifecycleCallbacks] */
+
 #[ApiResource(
   
   
@@ -200,6 +201,7 @@ class Cliente
         return $this->createAt;
     }
 
+/*     #[ORM\PrePersist] */
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
@@ -212,6 +214,7 @@ class Cliente
         return $this->updateAt;
     }
 
+ /*    #[ORM\PrePersist] */
     public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;
