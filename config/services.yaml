@@ -31,3 +31,5 @@ services:
 
   App\Controller\EstadoCuentaController:
     autowire: true
+
+  App\Entity\LineaFactura:

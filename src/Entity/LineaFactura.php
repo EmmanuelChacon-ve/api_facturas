@@ -6,38 +6,82 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\LineaFacturaRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Put;
+use App\Controller\VentaStatsController;
 
 #[ORM\Entity(repositoryClass: LineaFacturaRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(
+            name: 'venta_stats', 
+            uriTemplate: '/linea_facturas/venta/stats',
+            controller: VentaStatsController::class,
+            read: false,
+            output: false,
+            normalizationContext: [
+                'groups' => ['item:read']
+            ]
+        ),
+        new Put(denormalizationContext: [
+            'groups' => ['item:write']
+        ],),
+        new GetCollection(
+            normalizationContext: [
+                'groups' => ['item:read']
+            ]
+        ),
+        new Delete(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
+        new Post(  denormalizationContext: ['groups' => ['item:write']],),
+    ]
+
+)]
 class LineaFactura
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?int $cantidad = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+    #[Groups(["item:read", "item:write"])]
     private ?string $precio_unitario = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+    #[Groups(["item:read", "item:write"])]
     private ?string $subtotal = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
+ 
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'lineasfacturas')]
+    #[Groups(["item:read", "item:write"])]
+    
     private ?Factura $factura = null;
 
     #[ORM\ManyToOne(inversedBy: 'lineasFactura')]
+    #[Groups(["item:read", "item:write"])]
     private ?Producto $producto = null;
 
 

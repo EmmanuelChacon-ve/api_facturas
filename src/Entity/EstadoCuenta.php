@@ -15,11 +15,14 @@ use App\Controller\EstadoCuentaController;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+
 
 #[ORM\Entity(repositoryClass: EstadoCuentaRepository::class)]
 #[ApiResource(
     normalizationContext: [ 
-        'groups' => ['read']
+        'groups' => ['item:read']
     ],
     denormalizationContext: [
         'groups' => ['write']
@@ -33,9 +36,15 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
             output: false,
         ),
         new GetCollection(),
-        new Put(),
-        new Delete(),
-        new Post(),
+        new Put(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
+        new Delete(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
+        new Post(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['factura' => 'partial'])]
@@ -44,27 +53,35 @@ class EstadoCuenta
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+       #[Groups(["item:read", "item:write"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+       #[Groups(["item:read", "item:write"])]
     private ?string $saldo_actual = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+       #[Groups(["item:read", "item:write"])]
     private ?string $monto_pagado = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+       #[Groups(["item:read", "item:write"])]
     private ?string $monto_pendiente = null;
 
     #[ORM\Column]
+       #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
+       #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
+
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'estadosCuenta')]
+       #[Groups(["item:read", "item:write"])]
     private ?Factura $factura = null;
 
 

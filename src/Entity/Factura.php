@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Put;
 use App\Repository\FacturaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,12 +21,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
 #[ApiResource(
-    normalizationContext: [ 
-        'groups' => ['read']
-    ],
-    denormalizationContext: [
-        'groups' => ['write']
-    ],
+    
+    
 
     operations: [
         new Get(
@@ -34,12 +31,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
             controller: FacturaController::class,
             read: false,
             output: false,
-            filters: ['cliente']
+            filters: ['cliente'],
+            normalizationContext: [ 
+                'groups' => ['item:read']
+            ]
         ),
+        new get(),
+        new Put(denormalizationContext: [
+            'groups' => ['item:write']
+        ],),
         new GetCollection(),
         new Delete(
-            
+            denormalizationContext: ['groups' => ['item:write']],
         ),
+        new Post(  denormalizationContext: ['groups' => ['item:write']],),
     ]
 
 )]
@@ -50,39 +55,38 @@ class Factura
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["read"])]
+    #[Groups(["item:read", "item:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["read", "write"])]
+    #[Groups(["item:read", "item:write"])]
     private ?string $numfactura = null;
 
     #[ORM\Column]
-    #[Groups(['read'])]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['write'])]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['write'])]
+
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'facturas')]
-    #[Groups(['write'])]
     private ?Cliente $cliente = null;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: LineaFactura::class)]
-    #[Groups(['write'])]
+       #[Groups(["item:read", "item:write"])]
     private Collection $lineasfacturas;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: Pago::class)]
-    #[Groups(['write'])]
+       #[Groups(["item:read", "item:write"])]
     private Collection $pagos;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: EstadoCuenta::class)]
-    #[Groups(['write'])]
+       #[Groups(["item:read", "item:write"])]
     private Collection $estadosCuenta;
 
     public function __construct()

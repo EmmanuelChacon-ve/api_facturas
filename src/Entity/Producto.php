@@ -11,9 +11,32 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: ProductoRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(
+            normalizationContext: [ 
+                'groups' => ['item:read']
+            ]
+        ),
+        new Put(denormalizationContext: [
+            'groups' => ['item:write']
+        ],),
+        new GetCollection(),
+        new Delete(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
+        new Post(  denormalizationContext: ['groups' => ['item:write']],),
+    ]
+)]
 
 #[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
 class Producto
@@ -21,27 +44,36 @@ class Producto
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["item:read", "item:write"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(["item:read", "item:write"])]
     private ?string $description = null;
 
+
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
+    #[Groups(["item:read", "item:write"])]
     private ?string $precio = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
+
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\OneToMany(mappedBy: 'producto', targetEntity: LineaFactura::class)]
+    #[Groups(["item:read", "item:write"])]
     private Collection $lineasFactura;
 
 

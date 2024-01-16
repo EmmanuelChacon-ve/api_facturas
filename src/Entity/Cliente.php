@@ -12,29 +12,41 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use App\Controller\DeleteController;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+  
+  
     operations: [
         new Get(
+            normalizationContext: ['groups' => ['item:read']],
+        ),
+        new GetCollection(
             
         ),
-        new GetCollection(),
+        new Post(
+            denormalizationContext: ['groups' => ['item:client:write']],
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['item:write']],
+        ),
+
         new Delete(
             name: 'EliminadoLogico', 
             uriTemplate: '/clientes/{id}/delete',
             controller: DeleteController::class,
             read: false,
             output: false,
+            denormalizationContext: ['groups' => ['item:write']],
         ),
     ]
 )]
@@ -49,30 +61,39 @@ class Cliente
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["item:read", "item:write", "item:client:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["item:read", "item:write", "item:client:write"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["item:read", "item:write", "item:client:write"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(["item:read", "item:write","item:client:write"])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["item:read", "item:write","item:client:write"])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'cliente', targetEntity: Factura::class)]
+    #[Groups(["item:read", "item:write"])]
     private Collection $facturas;
 
 
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
+    #[Groups(["item:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $updateAt = null;
+ 
 
     
 
@@ -96,7 +117,6 @@ class Cliente
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
