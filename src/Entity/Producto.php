@@ -20,6 +20,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Put;
 
 #[ORM\Entity(repositoryClass: ProductoRepository::class)]
+#[ORM\HasLifecycleCallbacks] 
 #[ApiResource(
     operations: [
         new Get(
@@ -128,7 +129,7 @@ class Producto
     {
         return $this->createAt;
     }
-
+    #[ORM\PrePersist] 
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
@@ -140,7 +141,8 @@ class Producto
     {
         return $this->updateAt;
     }
-
+    #[ORM\PrePersist] 
+    #[ORM\PreUpdate]
     public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;

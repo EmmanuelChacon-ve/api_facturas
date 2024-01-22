@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 
 #[ORM\Entity(repositoryClass: EstadoCuentaRepository::class)]
+#[ORM\HasLifecycleCallbacks] 
 #[ApiResource(
     normalizationContext: [ 
         'groups' => ['item:estad:read']
@@ -130,7 +131,7 @@ class EstadoCuenta
     {
         return $this->createAt;
     }
-
+    #[ORM\PrePersist]
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
@@ -142,7 +143,8 @@ class EstadoCuenta
     {
         return $this->updateAt;
     }
-
+    #[ORM\PrePersist] 
+    #[ORM\PreUpdate]
     public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;

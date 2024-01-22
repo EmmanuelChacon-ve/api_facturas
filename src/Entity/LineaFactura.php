@@ -17,6 +17,7 @@ use App\Controller\VentaStatsController;
 use App\Controller\StockController;
 
 #[ORM\Entity(repositoryClass: LineaFacturaRepository::class)]
+#[ORM\HasLifecycleCallbacks] 
 #[ApiResource(
     operations: [
         new Get(
@@ -142,7 +143,7 @@ class LineaFactura
     {
         return $this->createdAt;
     }
-
+    #[ORM\PrePersist]
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -154,7 +155,8 @@ class LineaFactura
     {
         return $this->updateAt;
     }
-
+    #[ORM\PrePersist] 
+    #[ORM\PreUpdate]
     public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;

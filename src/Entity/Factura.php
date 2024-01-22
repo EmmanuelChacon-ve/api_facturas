@@ -21,6 +21,7 @@ use App\Controller\ResumenCajaController;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
+#[ORM\HasLifecycleCallbacks] 
 #[ApiResource(
     
     
@@ -128,7 +129,7 @@ class Factura
     {
         return $this->createdAt;
     }
-
+    #[ORM\PrePersist]
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -140,7 +141,8 @@ class Factura
     {
         return $this->updateAt;
     }
-
+    #[ORM\PrePersist] 
+    #[ORM\PreUpdate]
     public function setUpdateAt(\DateTimeImmutable $updateAt): static
     {
         $this->updateAt = $updateAt;
