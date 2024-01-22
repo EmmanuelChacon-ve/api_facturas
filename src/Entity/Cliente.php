@@ -20,6 +20,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Controller\TopClientesController;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
@@ -46,7 +47,7 @@ use App\Controller\TopClientesController;
             denormalizationContext: ['groups' => ['item:client:write']],
         ),
         new Put(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:client:write']],
         ),
 
         new Delete(
@@ -111,6 +112,7 @@ class Cliente
     public function __construct()
     {
         $this->facturas = new ArrayCollection();
+       
     }
 
     public function getId(): ?int
@@ -208,10 +210,14 @@ class Cliente
     {
         return $this->createAt;
     }
-    #[ORM\PrePersist]
+
+
     public function setCreateAt(\DateTimeImmutable $createAt): static
     {
-        $this->createAt = $createAt;
+        // Solo asigna createAt si no tiene un valor previo
+        if (!$this->createAt) {
+            $this->createAt = $createAt;
+        }
 
         return $this;
     }
@@ -221,13 +227,11 @@ class Cliente
         return $this->updateAt;
     }
 
-    #[ORM\PrePersist] 
     #[ORM\PreUpdate]
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
-    {
-        $this->updateAt = $updateAt;
 
-        return $this;
+    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
 
     /**

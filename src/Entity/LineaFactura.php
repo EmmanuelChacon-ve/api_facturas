@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Put;
 use App\Controller\VentaStatsController;
 use App\Controller\StockController;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 #[ORM\Entity(repositoryClass: LineaFacturaRepository::class)]
 #[ORM\HasLifecycleCallbacks] 
@@ -155,13 +156,12 @@ class LineaFactura
     {
         return $this->updateAt;
     }
-    #[ORM\PrePersist] 
+ 
     #[ORM\PreUpdate]
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
-    {
-        $this->updateAt = $updateAt;
 
-        return $this;
+    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
 
     public function getDeleteAt(): ?\DateTimeImmutable

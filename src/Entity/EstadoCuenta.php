@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 
 
@@ -143,14 +144,14 @@ class EstadoCuenta
     {
         return $this->updateAt;
     }
-    #[ORM\PrePersist] 
-    #[ORM\PreUpdate]
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
-    {
-        $this->updateAt = $updateAt;
 
-        return $this;
+    #[ORM\PreUpdate]
+
+    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
+
 
     public function getDeleteAt(): ?\DateTimeImmutable
     {

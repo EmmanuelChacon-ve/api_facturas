@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Put;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 #[ORM\Entity(repositoryClass: ProductoRepository::class)]
 #[ORM\HasLifecycleCallbacks] 
@@ -141,14 +142,14 @@ class Producto
     {
         return $this->updateAt;
     }
-    #[ORM\PrePersist] 
-    #[ORM\PreUpdate]
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
-    {
-        $this->updateAt = $updateAt;
 
-        return $this;
+    #[ORM\PreUpdate]
+
+    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
+
 
     public function getDeleteAt(): ?\DateTimeImmutable
     {

@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Delete;
 use App\Controller\FacturaController;
 use App\Controller\ResumenCajaController;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
 #[ORM\HasLifecycleCallbacks] 
@@ -141,14 +142,14 @@ class Factura
     {
         return $this->updateAt;
     }
-    #[ORM\PrePersist] 
-    #[ORM\PreUpdate]
-    public function setUpdateAt(\DateTimeImmutable $updateAt): static
-    {
-        $this->updateAt = $updateAt;
 
-        return $this;
+    #[ORM\PreUpdate]
+
+    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
+
 
     public function getDeleteAt(): ?\DateTimeImmutable
     {
