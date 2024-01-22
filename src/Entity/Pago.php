@@ -22,17 +22,17 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(
             normalizationContext: [ 
-                'groups' => ['item:read']
+                'groups' => ['item:pago:read']
             ]
         ),
         new Put(denormalizationContext: [
-            'groups' => ['item:write']
+            'groups' => ['item:pago:write']
         ],),
         new GetCollection(),
         new Delete(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:pago:write']],
         ),
-        new Post(  denormalizationContext: ['groups' => ['item:write']],),
+        new Post(  denormalizationContext: ['groups' => ['item:pago:write']],),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['metodo_pago' => 'partial'])]
@@ -41,23 +41,23 @@ class Pago
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:pago:read", "item:pago:write"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:pago:read", "item:pago:write"])]
     private ?string $monto = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:pago:read", "item:pago:write"])]
     private ?string $metodo_pago = null;
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:pago:read", "item:pago:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:pago:read", "item:pago:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -65,7 +65,7 @@ class Pago
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'pagos')]
-        #[Groups(["item:read", "item:write"])]
+        #[Groups(["item:pago:read", "item:pago:write"])]
     private ?Factura $factura = null;
 
     public function getId(): ?int

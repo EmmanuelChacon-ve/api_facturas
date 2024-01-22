@@ -33,23 +33,24 @@ class VentaStatsController extends AbstractController
 
     private function getProductoMasVendido(): ?array
     {
-        // Consultar la base de datos para obtener el producto más vendido
-        $query = $this->entityManager->createQuery('
-            SELECT IDENTITY(lf.producto) as productoId, COUNT(lf.id) as cantidad
-            FROM App\Entity\LineaFactura lf
-            GROUP BY lf.producto
-            ORDER BY cantidad DESC
-        ');
+        // Utilizar QueryBuilder para construir la consulta
+        $qb = $this->entityManager->createQueryBuilder();
+        $productoMasVendido = $qb
+            ->select('IDENTITY(lf.producto) as productoId, COUNT(lf.id) as cantidad')
+            ->from('App\Entity\LineaFactura', 'lf')
+            ->groupBy('lf.producto')
+            ->orderBy('cantidad', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
 
-        $result = $query->setMaxResults(1)->getResult();
-
-        if (!$result) {
+        if (!$productoMasVendido) {
             return null;
         }
 
         return [
-            'productoId' => reset($result)['productoId'],
-            'cantidad' => reset($result)['cantidad'],
+            'productoId' => reset($productoMasVendido)['productoId'],
+            'cantidad' => reset($productoMasVendido)['cantidad'],
         ];
     }
 }

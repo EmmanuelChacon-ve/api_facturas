@@ -24,17 +24,17 @@ use ApiPlatform\Metadata\Put;
     operations: [
         new Get(
             normalizationContext: [ 
-                'groups' => ['item:read']
+                'groups' => ['item:product:read']
             ]
         ),
         new Put(denormalizationContext: [
-            'groups' => ['item:write']
+            'groups' => ['item:product:write']
         ],),
         new GetCollection(),
         new Delete(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:product:write']],
         ),
-        new Post(  denormalizationContext: ['groups' => ['item:write']],),
+        new Post(  denormalizationContext: ['groups' => ['item:product:write']],),
     ]
 )]
 
@@ -44,28 +44,28 @@ class Producto
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?string $description = null;
 
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?string $precio = null;
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -73,7 +73,7 @@ class Producto
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\OneToMany(mappedBy: 'producto', targetEntity: LineaFactura::class)]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:product:read", "item:product:write"])]
     private Collection $lineasFactura;
 
 

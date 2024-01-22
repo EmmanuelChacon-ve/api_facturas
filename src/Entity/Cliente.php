@@ -19,6 +19,7 @@ use App\Controller\DeleteController;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\SoftDeleteable\Traits\SoftDeleteableEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
+use App\Controller\TopClientesController;
 
 
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
@@ -29,7 +30,14 @@ use Symfony\Component\Serializer\Annotation\Groups;
   
     operations: [
         new Get(
-            normalizationContext: ['groups' => ['item:read']],
+            name: 'clientesTop', 
+            uriTemplate: '/clientes/top',
+            controller: TopClientesController::class,
+            read: false,
+            output: false,
+            normalizationContext: [ 
+                'groups' => ['item:client:read']
+            ]
         ),
         new GetCollection(
             
@@ -62,37 +70,37 @@ class Cliente
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["item:read", "item:write", "item:client:write"])]
+    #[Groups(["item:client:read", "item:write", "item:client:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:read", "item:write", "item:client:write"])]
+    #[Groups(["item:client:read", "item:write", "item:client:write"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:read", "item:write", "item:client:write"])]
+    #[Groups(["item:client:read", "item:write", "item:client:write"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(["item:read", "item:write","item:client:write"])]
+    #[Groups(["item:client:read", "item:write","item:client:write"])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:read", "item:write","item:client:write"])]
+    #[Groups(["item:client:read", "item:write","item:client:write"])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'cliente', targetEntity: Factura::class)]
-    #[Groups(["item:read", "item:write"])]
+    #[Groups(["item:client:read", "item:write"])]
     private Collection $facturas;
 
 
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write","item:client:write"])]
+    #[Groups(["item:client:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
-    #[Groups(["item:read", "item:write","item:client:write"])]
+    #[Groups(["item:client:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $updateAt = null;
  
 

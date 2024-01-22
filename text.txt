@@ -1,0 +1,2 @@
+utilizar querybuilder en el stas  en el query 
+

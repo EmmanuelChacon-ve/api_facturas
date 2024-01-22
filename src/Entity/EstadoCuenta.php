@@ -22,10 +22,10 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: EstadoCuentaRepository::class)]
 #[ApiResource(
     normalizationContext: [ 
-        'groups' => ['item:read']
+        'groups' => ['item:estad:read']
     ],
     denormalizationContext: [
-        'groups' => ['write']
+        'groups' => ['item:estado:write']
     ],
     operations: [
         new Get(
@@ -37,13 +37,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
         ),
         new GetCollection(),
         new Put(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:estado:write']],
         ),
         new Delete(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:estado:write']],
         ),
         new Post(
-            denormalizationContext: ['groups' => ['item:write']],
+            denormalizationContext: ['groups' => ['item:estado:write']],
         ),
     ]
 )]
@@ -53,27 +53,27 @@ class EstadoCuenta
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?string $saldo_actual = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?string $monto_pagado = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?string $monto_pendiente = null;
 
     #[ORM\Column]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -81,7 +81,7 @@ class EstadoCuenta
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'estadosCuenta')]
-       #[Groups(["item:read", "item:write"])]
+       #[Groups(["item:estado:read", "item:estado:write"])]
     private ?Factura $factura = null;
 
 
