@@ -22,33 +22,38 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 #[ORM\Entity(repositoryClass: FacturaRepository::class)]
-#[ORM\HasLifecycleCallbacks] 
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource(
-    
-    
+
+
 
     operations: [
         new Get(
-            name: 'facturas', 
+            normalizationContext: [
+                'groups' => ['item:factura:read']
+            ],
+        ),
+        new Get(
+            name: 'facturas',
             uriTemplate: '/facturas/{id}/calcular',
             controller: FacturaController::class,
             read: false,
             output: false,
             filters: ['cliente'],
-            normalizationContext: [ 
+            normalizationContext: [
                 'groups' => ['item:factura:read']
-            ]
+            ],
         ),
-        new get(
-            name: 'facturas', 
+        new Get(
+            name: 'facturas',
             uriTemplate: '/facturas/caja',
             controller: ResumenCajaController::class,
             read: false,
             output: false,
-            filters:['updateAt'],
-            normalizationContext: [ 
+            filters: ['updateAt'],
+            normalizationContext: [
                 'groups' => ['item:factura:read']
-            ]
+            ],
         ),
         new Put(denormalizationContext: [
             'groups' => ['item:factura:write']
@@ -57,7 +62,10 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
         new Delete(
             denormalizationContext: ['groups' => ['item:factura:write']],
         ),
-        new Post(  denormalizationContext: ['groups' => ['item:factura:write']],),
+        new Post(
+            denormalizationContext: ['groups' => ['item:factura:set:write']],
+            normalizationContext: ['groups' => ['item:factura:set:write']],
+        ),
     ]
 
 )]
@@ -72,15 +80,15 @@ class Factura
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:factura:read", "item:factura:write"])]
+    #[Groups(["item:factura:read", "item:factura:write","item:factura:set:write"])]
     private ?string $numfactura = null;
 
-    #[ORM\Column]
-    #[Groups(["item:factura:read", "item:factura:write"])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(["item:factura:read", "item:factura:write","item:factura:set:write"])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
-    #[Groups(["item:factura:read", "item:factura:write"])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(["item:factura:read", "item:factura:write", "item:factura:set:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -88,18 +96,19 @@ class Factura
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'facturas')]
+    #[Groups(["item:factura:read", "item:factura:write", "item:factura:set:write"])]
     private ?Cliente $cliente = null;
 
-    #[ORM\OneToMany(mappedBy: 'factura', targetEntity: LineaFactura::class)]
-       #[Groups(["item:factura:read", "item:factura:write"])]
+    #[ORM\OneToMany(mappedBy: 'factura', targetEntity: LineaFactura::class, cascade: ["persist"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private Collection $lineasfacturas;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: Pago::class)]
-       #[Groups(["item:factura:read", "item:factura:write"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private Collection $pagos;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: EstadoCuenta::class)]
-       #[Groups(["item:factura:read", "item:factura:write"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private Collection $estadosCuenta;
 
     public function __construct()
@@ -130,10 +139,18 @@ class Factura
     {
         return $this->createdAt;
     }
-    #[ORM\PrePersist]
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): static
+    {
+        $this->createdAt = new \DateTimeImmutable();
 
         return $this;
     }
@@ -142,13 +159,24 @@ class Factura
     {
         return $this->updateAt;
     }
+    
 
     #[ORM\PreUpdate]
 
-    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updateAt = $updatedAt;
+
+        return $this;
+    }
+
+  /*   #[ORM\PreUpdate]
+    public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): self
     {
         $this->updateAt = new \DateTimeImmutable();
-    }
+
+        return $this;
+    } */
 
 
     public function getDeleteAt(): ?\DateTimeImmutable
@@ -205,7 +233,7 @@ class Factura
         return $this;
     }
 
-  /*   public function getClienteFactura(): ?Cliente
+    /*   public function getClienteFactura(): ?Cliente
     {
         return $this->cliente_factura;
     }
@@ -282,7 +310,7 @@ class Factura
      */
 
 
-/*     public function addEstadoCuenta(EstadoCuenta $estadoCuenta): static
+    /*     public function addEstadoCuenta(EstadoCuenta $estadoCuenta): static
     {
         if (!$this->estadoCuentas->contains($estadoCuenta)) {
             $this->estadoCuentas->add($estadoCuenta);

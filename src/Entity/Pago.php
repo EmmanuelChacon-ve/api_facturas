@@ -54,11 +54,11 @@ class Pago
     #[Groups(["item:pago:read", "item:pago:write"])]
     private ?string $metodo_pago = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(["item:pago:read", "item:pago:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(["item:pago:read", "item:pago:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
@@ -103,25 +103,42 @@ class Pago
     {
         return $this->createAt;
     }
-    #[ORM\PrePersist] 
-    public function setCreateAt(\DateTimeImmutable $createAt): static
+
+
+    public function setCreatedAt(?\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
 
         return $this;
     }
 
+  /*   #[ORM\PrePersist]
+    public function setCreatedAtValue(): static
+    {
+        $this->createAt = new \DateTimeImmutable();
+
+        return $this;
+    } */
+
     public function getUpdateAt(): ?\DateTimeImmutable
     {
         return $this->updateAt;
     }
- 
-    #[ORM\PreUpdate]
 
-    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updateAt = $updatedAt;
+
+        return $this;
+    }
+
+  /*   #[ORM\PreUpdate]
+    public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): self
     {
         $this->updateAt = new \DateTimeImmutable();
-    }
+
+        return $this;
+    } */
 
 
     public function getDeleteAt(): ?\DateTimeImmutable

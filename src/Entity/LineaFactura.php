@@ -18,11 +18,16 @@ use App\Controller\StockController;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 #[ORM\Entity(repositoryClass: LineaFacturaRepository::class)]
-#[ORM\HasLifecycleCallbacks] 
+#[ORM\HasLifecycleCallbacks]
 #[ApiResource(
     operations: [
         new Get(
-            name: 'venta_stats', 
+            normalizationContext: [
+                'groups' => ['item:lfactura:read']
+            ]
+        ),
+        new Get(
+            name: 'venta_stats',
             uriTemplate: '/linea_facturas/venta/stats',
             controller: VentaStatsController::class,
             read: false,
@@ -32,7 +37,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
             ]
         ),
         new Get(
-            name: 'stock', 
+            name: 'stock',
             uriTemplate: '/linea_facturas/stock/calculate',
             controller: StockController::class,
             read: false,
@@ -52,7 +57,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
         new Delete(
             denormalizationContext: ['groups' => ['item:lfactura:write']],
         ),
-        new Post(  denormalizationContext: ['groups' => ['item:lfactura:write']],),
+        new Post(denormalizationContext: ['groups' => ['item:lfactura:write']],),
     ]
 
 )]
@@ -61,40 +66,40 @@ class LineaFactura
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:read"])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:write", "item:factura:read"])]
     private ?int $cantidad = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:write", "item:factura:read"])]
     private ?string $precio_unitario = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:write", "item:factura:read"])]
     private ?string $subtotal = null;
 
-    #[ORM\Column]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:read"])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:read"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
- 
+
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'lineasfacturas')]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
-    
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:write"])]
+
     private ?Factura $factura = null;
 
     #[ORM\ManyToOne(inversedBy: 'lineasFactura')]
-    #[Groups(["item:lfactura:read", "item:lfactura:write"])]
+    #[Groups(["item:lfactura:read", "item:lfactura:write", "item:factura:write", "item:factura:read"])]
     private ?Producto $producto = null;
 
 
@@ -144,7 +149,7 @@ class LineaFactura
     {
         return $this->createdAt;
     }
-    #[ORM\PrePersist]
+
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
@@ -152,17 +157,29 @@ class LineaFactura
         return $this;
     }
 
+ /*    #[ORM\PrePersist]
+    public function setCreatedAtValue(): static
+    {
+        $this->createdAt = new \DateTimeImmutable();
+
+        return $this;
+    } */
+
     public function getUpdateAt(): ?\DateTimeImmutable
     {
         return $this->updateAt;
     }
- 
-    #[ORM\PreUpdate]
 
-    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+    public function setUpdateAt(\DateTimeImmutable $updateAt): void
+    {
+        $this->updateAt = $updateAt;
+    }
+/* 
+    #[ORM\PreUpdate]
+    public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): void
     {
         $this->updateAt = new \DateTimeImmutable();
-    }
+    } */
 
     public function getDeleteAt(): ?\DateTimeImmutable
     {
@@ -199,6 +216,4 @@ class LineaFactura
 
         return $this;
     }
-
-
 }

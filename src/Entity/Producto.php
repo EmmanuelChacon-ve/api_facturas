@@ -62,11 +62,11 @@ class Producto
     #[Groups(["item:product:read", "item:product:write"])]
     private ?string $precio = null;
 
-    #[ORM\Column]
+     #[ORM\Column(nullable: true)]
     #[Groups(["item:product:read", "item:product:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
-    #[ORM\Column]
+     #[ORM\Column(nullable: true)]
     #[Groups(["item:product:read", "item:product:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
@@ -130,25 +130,40 @@ class Producto
     {
         return $this->createAt;
     }
-    #[ORM\PrePersist] 
-    public function setCreateAt(\DateTimeImmutable $createAt): static
+    public function setCreatedAt(?\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
 
         return $this;
     }
+/* 
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): static
+    {
+        $this->createAt = new \DateTimeImmutable();
+
+        return $this;
+    } */
 
     public function getUpdateAt(): ?\DateTimeImmutable
     {
         return $this->updateAt;
     }
 
-    #[ORM\PreUpdate]
+    public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
+    {
+        $this->updateAt = $updatedAt;
 
-    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+        return $this;
+    }
+/* 
+    #[ORM\PreUpdate]
+    public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): self
     {
         $this->updateAt = new \DateTimeImmutable();
-    }
+
+        return $this;
+    } */
 
 
     public function getDeleteAt(): ?\DateTimeImmutable

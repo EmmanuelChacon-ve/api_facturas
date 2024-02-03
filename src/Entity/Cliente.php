@@ -31,6 +31,11 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
   
     operations: [
         new Get(
+            normalizationContext: [ 
+                'groups' => ['item:client:read']
+            ]
+        ),
+        new Get(
             name: 'clientesTop', 
             uriTemplate: '/clientes/top',
             controller: TopClientesController::class,
@@ -45,6 +50,9 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
         ),
         new Post(
             denormalizationContext: ['groups' => ['item:client:write']],
+            normalizationContext: [ 
+                'groups' => ['item:read']
+            ]
         ),
         new Put(
             denormalizationContext: ['groups' => ['item:client:write']],
@@ -71,23 +79,23 @@ class Cliente
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["item:client:read", "item:write", "item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write", "item:client:write"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:client:read", "item:write", "item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write", "item:client:write"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:client:read", "item:write", "item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write", "item:client:write"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(["item:client:read", "item:write","item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write","item:client:write"])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:client:read", "item:write","item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write","item:client:write"])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'cliente', targetEntity: Factura::class)]
@@ -97,11 +105,11 @@ class Cliente
 
 
     #[ORM\Column]
-    #[Groups(["item:client:read", "item:write","item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column]
-    #[Groups(["item:client:read", "item:write","item:client:write"])]
+    #[Groups(["item:read","item:client:read", "item:write","item:client:write"])]
     private ?\DateTimeImmutable $updateAt = null;
  
 
@@ -210,14 +218,18 @@ class Cliente
     {
         return $this->createAt;
     }
-
-
-    public function setCreateAt(\DateTimeImmutable $createAt): static
+    
+    #[ORM\PrePersist]
+    public function setCreateAtValue(): static
     {
-        // Solo asigna createAt si no tiene un valor previo
-        if (!$this->createAt) {
-            $this->createAt = $createAt;
-        }
+        $this->createAt = new \DateTimeImmutable();
+
+        return $this;
+    }
+
+    public function setCreateAt(?\DateTimeImmutable $createAt): static
+    {
+        $this->createAt = $createAt;
 
         return $this;
     }
@@ -227,12 +239,23 @@ class Cliente
         return $this->updateAt;
     }
 
-    #[ORM\PreUpdate]
-
-    public function setUpdateAt(PreUpdateEventArgs $eventArgs): void
+   /*  public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
     {
-        $this->updateAt = new \DateTimeImmutable();
+        $this->updateAt = $updatedAt;
+
+        return $this;
     }
+ */
+
+#[ORM\PreUpdate]
+
+public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
+{
+    $this->updateAt = $updatedAt;
+
+    return $this;
+}
+
 
     /**
      * @return \DateTimeImmutable|null
