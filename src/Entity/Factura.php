@@ -63,8 +63,8 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
             denormalizationContext: ['groups' => ['item:factura:write']],
         ),
         new Post(
-            denormalizationContext: ['groups' => ['item:factura:set:write']],
-            normalizationContext: ['groups' => ['item:factura:set:write']],
+            denormalizationContext: ['groups' => ['item:factura:write']],
+            normalizationContext: ['groups' => ['item:factura:write']],
         ),
     ]
 
@@ -80,15 +80,15 @@ class Factura
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:factura:read", "item:factura:write","item:factura:set:write"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private ?string $numfactura = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["item:factura:read", "item:factura:write","item:factura:set:write"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["item:factura:read", "item:factura:write", "item:factura:set:write"])]
+    #[Groups(["item:factura:read", "item:factura:write"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -96,7 +96,6 @@ class Factura
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'facturas')]
-    #[Groups(["item:factura:read", "item:factura:write", "item:factura:set:write"])]
     private ?Cliente $cliente = null;
 
     #[ORM\OneToMany(mappedBy: 'factura', targetEntity: LineaFactura::class, cascade: ["persist"])]
@@ -159,9 +158,6 @@ class Factura
     {
         return $this->updateAt;
     }
-    
-
-    #[ORM\PreUpdate]
 
     public function setUpdateAt(?\DateTimeImmutable $updatedAt): self
     {

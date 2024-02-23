@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\PagoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiFilter;
@@ -34,7 +36,11 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
         new Delete(
             denormalizationContext: ['groups' => ['item:pago:write']],
         ),
-        new Post(  denormalizationContext: ['groups' => ['item:pago:write']],),
+        new Post(  denormalizationContext: ['groups' => ['item:pago:write:post']],
+        normalizationContext: [ 
+            'groups' => ['item:pago:write:post']
+        ]
+       ),
     ]
 )]
 #[ApiFilter(SearchFilter::class, properties: ['metodo_pago' => 'partial'])]
@@ -47,19 +53,19 @@ class Pago
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: '0')]
-    #[Groups(["item:pago:read", "item:pago:write"])]
+    #[Groups(["item:pago:read", "item:pago:write", "item:pago:write:post"])]
     private ?string $monto = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["item:pago:read", "item:pago:write"])]
+    #[Groups(["item:pago:read", "item:pago:write", "item:pago:write:post"])]
     private ?string $metodo_pago = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["item:pago:read", "item:pago:write"])]
+    #[Groups(["item:pago:read", "item:pago:write", "item:pago:write:post"])]
     private ?\DateTimeImmutable $createAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(["item:pago:read", "item:pago:write"])]
+    #[Groups(["item:pago:read", "item:pago:write","item:pago:write:post"])]
     private ?\DateTimeImmutable $updateAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -67,8 +73,16 @@ class Pago
     private ?\DateTimeImmutable $deleteAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'pagos')]
-        #[Groups(["item:pago:read", "item:pago:write"])]
+        #[Groups(["item:pago:read", "item:pago:write","item:pago:write:post"])]
     private ?Factura $factura = null;
+
+    #[ORM\OneToMany(mappedBy: 'log_pago', targetEntity: Log::class)]
+    private Collection $logs;
+
+    public function __construct()
+    {
+        $this->logs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,20 +119,13 @@ class Pago
     }
 
 
-    public function setCreatedAt(?\DateTimeImmutable $createAt): static
+    public function setCreateAt(?\DateTimeImmutable $createAt): static
     {
         $this->createAt = $createAt;
 
         return $this;
     }
 
-  /*   #[ORM\PrePersist]
-    public function setCreatedAtValue(): static
-    {
-        $this->createAt = new \DateTimeImmutable();
-
-        return $this;
-    } */
 
     public function getUpdateAt(): ?\DateTimeImmutable
     {
@@ -132,13 +139,7 @@ class Pago
         return $this;
     }
 
-  /*   #[ORM\PreUpdate]
-    public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): self
-    {
-        $this->updateAt = new \DateTimeImmutable();
 
-        return $this;
-    } */
 
 
     public function getDeleteAt(): ?\DateTimeImmutable
@@ -161,6 +162,36 @@ class Pago
     public function setFactura(?Factura $factura): static
     {
         $this->factura = $factura;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Log>
+     */
+    public function getLogs(): Collection
+    {
+        return $this->logs;
+    }
+
+    public function addLog(Log $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setLogPago($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLog(Log $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            // set the owning side to null (unless already changed)
+            if ($log->getLogPago() === $this) {
+                $log->setLogPago(null);
+            }
+        }
 
         return $this;
     }

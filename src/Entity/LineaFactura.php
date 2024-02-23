@@ -157,13 +157,13 @@ class LineaFactura
         return $this;
     }
 
- /*    #[ORM\PrePersist]
+    #[ORM\PrePersist]
     public function setCreatedAtValue(): static
     {
         $this->createdAt = new \DateTimeImmutable();
 
         return $this;
-    } */
+    }
 
     public function getUpdateAt(): ?\DateTimeImmutable
     {
@@ -174,13 +174,13 @@ class LineaFactura
     {
         $this->updateAt = $updateAt;
     }
-/* 
-    #[ORM\PreUpdate]
+
+  /*   #[ORM\PreUpdate]
     public function setUpdateAtValue(PreUpdateEventArgs $eventArgs): void
     {
         $this->updateAt = new \DateTimeImmutable();
-    } */
-
+    }
+ */
     public function getDeleteAt(): ?\DateTimeImmutable
     {
         return $this->deleteAt;
